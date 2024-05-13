@@ -188,7 +188,7 @@ export default function ListWidget({ items = [] }) {
                 key={item.id}
                 className={cn(
                   "font-bold",
-                  selectedId === item.id ? "text-blue-700" : "text-gray-500"
+                  selectedId === item.id ? "text-blue-700" : "text-gray-500",
                 )}
               >
                 <button onClick={() => setSelectedId(item.id)}>
