@@ -14,6 +14,7 @@
 ## Changes from CommonJS to ESM
 
 - Relative imports must include the full path to the import source, including any extensions. Directory imports with implicit `index.js` is not allowed.
+
   - e.g. A directory import
 
     ```diff
@@ -41,19 +42,19 @@
   Code that uses these variables must be refactored to ESM alternatives:
 
   ```js
-  import { URL } from 'url'; 
-  const __filename = new URL('', import.meta.url).pathname;
+  import { URL } from "url";
+  const __filename = new URL("", import.meta.url).pathname;
   ```
 
   ```js
-  import url from 'url';
-  const __dirname = url.fileURLToPath(new url.URL('.', import.meta.url));
+  import url from "url";
+  const __dirname = url.fileURLToPath(new url.URL(".", import.meta.url));
   ```
 
 - `module` is undefined in ESM. Scripts that can be both imported and executed, need to check this differently.
 
   ```js
-  import { pathToFileURL } from 'url';
+  import { pathToFileURL } from "url";
 
   export function run() {
     // some function
@@ -68,10 +69,10 @@
 - `require` is undefined. Scripts that need `required` need to be refactored.
 
   ```js
-  import { createRequire } from 'node:module';
+  import { createRequire } from "node:module";
   const require = createRequire(import.meta.url);
   // eslint-disable-next-line import/no-commonjs
-  const cloudflareIps = require('cloudflare-ip/ips.json');
+  const cloudflareIps = require("cloudflare-ip/ips.json");
   ```
 
 - ESM imports are immutable, test libraries for mocking and stubbing imports do not work with ESM. `sinon` would have to be replaced by an alternative and tests refactored.
@@ -80,23 +81,24 @@
 
     ```js
     beforeEach(async () => {
-      const transferWiseLibMock = await td.replaceEsm('../../../server/lib/transferwise.js');
+      const transferWiseLibMock = await td.replaceEsm(
+        "../../../server/lib/transferwise.js",
+      );
       // getTransfer is a testdouble that can be used to stub and verify calls to it.
       getTransfer = transferWiseLibMock.getTransfer;
 
       // cron is the test subject, imported after replacing the ESM dependency above.
-      const cron = await import('../../../cron/daily/check-pending-transferwise-transactions.js');
+      const cron = await import(
+        "../../../cron/daily/check-pending-transferwise-transactions.js"
+      );
       checkPendingTransfers = cron.run;
     });
 
-    it('test', () => {
+    it("test", () => {
       td.when(
-          getTransfer(
-            td.matchers.anything(), 
-            td.matchers.anything(),
-          )
+        getTransfer(td.matchers.anything(), td.matchers.anything()),
       ).thenResolve({
-        status: 'outgoing_payment_sent',
+        status: "outgoing_payment_sent",
         id: 1234,
       });
     });
